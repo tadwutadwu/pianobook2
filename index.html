@@ -3,397 +3,514 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>伦敦无价之旅</title>
+    <title>探索郎朗的《钢琴书2》(2024)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            font-family: 'Noto+Sans+SC', sans-serif;
         }
-        .card {
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .active-nav {
+            background-color: #fef3c7; 
+            color: #92400e; 
+            font-weight: 600;
         }
-        .details-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
-            opacity: 0;
-            padding-top: 0;
+        .content-panel h2 {
+            font-size: 1.875rem; 
+            font-weight: 700;
+            color: #1c1917; 
+            margin-bottom: 0.25rem; /* 调整标题下边距 */
         }
-        .details-content.open {
-            max-height: 2000px; /* A large value to allow for transition */
-            opacity: 1;
-            padding-top: 1rem;
+        .content-panel .english-title {
+            font-size: 1.125rem; /* 英文标题大小 */
+            color: #78716c; /* 英文标题颜色 */
+            margin-bottom: 1rem; /* 英文标题下边距 */
+            display: block; /* 确保独占一行 */
+        }
+        .content-panel h3 {
+            font-size: 1.5rem; 
+            line-height: 2rem;
+            font-weight: 600;
+            color: #b45309; 
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #fcd34d;
+            padding-bottom: 0.25rem;
+        }
+        .content-panel p, .content-panel li {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: #44403c;
+        }
+        .content-panel ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        #sidebar {
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #content-area {
+             height: 100vh;
+            overflow-y: auto;
         }
     </style>
-</head>
-<body class="bg-gray-100 p-4">
+    <!-- Chosen Palette: Warm Neutrals (Amber/Stone) --><!-- Application Structure Plan: Master-Detail布局。左侧侧边栏，右侧内容区。 --><!-- Visualization & Content Choices: [Report Info: 《钢琴书2》29首曲目列表及分析。Goal: 提供全局背景。Viz/Presentation: Chart.js 条形图（“作曲家时期分布”）。Interaction: 静态图表，在“总览”面板中加载。Justification: 直观展示专辑的广泛涉猎。] [Report Info: 单个曲目分析（作曲家、背景、介绍、英文全称）。Goal: 呈现详细结构化信息。Viz/Presentation: 动态内容面板中的结构化HTML文本（标题、段落、列表）。Interaction: 通过点击侧边栏导航显示内容（Master-Detail模式）。Justification: 基于文本的呈现最清晰，交互性使大量文本易于管理。] --><!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. --></head>
+<body class="bg-amber-50 text-stone-800 flex flex-col md:flex-row min-h-screen">
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
-            <h1 id="main-title" class="text-4xl font-bold text-gray-800 mb-4 sm:mb-0">伦敦无价之旅</h1>
-            <button id="lang-toggle-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition-colors duration-200">English</button>
-        </div>
+    <nav id="sidebar" class="w-full md:w-1/3 lg:w-1/4 bg-white shadow-xl p-4 md:p-6">
+        <h1 class="text-2xl font-bold text-stone-900 mb-6">《钢琴书2》曲目</h1>
+        <ul class="space-y-1">
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100 active-nav" data-target="overview">专辑总览</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track1">1. 肖邦: E小调前奏曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track2">2. 门德尔松: "春之歌"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track3">3. 李斯特: 慰藉曲 No. 2</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track4">4. 久石让: "春天"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track5">5. 莫扎特: D大调回旋曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track6">6. 贝多芬: "丢失一分钱的愤怒"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track7">7. 萨蒂: 裸体歌舞 No. 1</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track8">8. 舒伯特: G♭大调即兴曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track9">9. 拉赫玛尼诺夫: 帕格尼尼变奏18</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track10">10. 《火影忍者》: 悲伤与哀愁</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track11">11. 西贝柳斯: A小调练习曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track12">12. 亨德尔: G小调小步舞曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track13">13. 巴赫: C小调前奏曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track14">14. Wrangell: Rush E</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track15">15. 《爱乐之城》: 米娅和塞巴斯蒂安</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track16">16. 肖邦: 降E大调夜曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track17">17. 舒曼: "肖邦" (选自《狂欢节》)</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track18">18. 布格缪勒: "阿拉伯风格"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track19">19. 艾诺迪: "飞翔"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track20">20. 《黑神话：悟空》: 主题曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track21">21. 肖邦: 幻想即兴曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track22">22. 《最终幻想X》: 扎纳尔坎德</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track23">23. 《天使爱美丽》: 另一个夏天的童谣</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track24">24. 《天堂电影院》: 主题曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track25">25. 拉赫玛尼诺夫: 升C小调前奏曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track26">26. 贝多芬: 土耳其进行曲</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track27">27. Tony Ann: "伊卡洛斯"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track28">28. 《原神》: "恋人的誓言"</a></li>
+            <li><a href="#" class="nav-link block p-2 rounded-lg hover:bg-amber-100" data-target="track29">29. 拿撒勒: "Brejeiro" (巴西探戈)</a></li>
+        </ul>
+    </nav>
 
-        <!-- Currency Converter Section -->
-        <div class="grid grid-cols-1 gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 id="converter-title" class="text-2xl font-semibold text-gray-800 mb-4">货币转换器</h2>
-                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <div class="relative w-full sm:w-1/2">
-                        <label for="gbp-input" id="gbp-label" class="sr-only">英镑（GBP）</label>
-                        <input type="number" id="gbp-input" placeholder="输入英镑金额..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">GBP</span>
-                    </div>
-                    <button id="convert-btn" class="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition-colors duration-200">计算</button>
-                    <div class="relative w-full sm:w-1/2">
-                        <label for="cny-output" id="cny-label" class="sr-only">人民币（CNY）</label>
-                        <input type="text" id="cny-output" readonly placeholder="人民币价格" class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-800 cursor-not-allowed">
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">CNY</span>
-                    </div>
-                </div>
-                <p id="exchange-rate-info" class="text-sm text-gray-500 mt-4 text-center">汇率信息：加载中...</p>
+    <main id="content-area" class="w-full md:w-2/3 lg:w-3/4 p-6 md:p-10">
+        
+        <div id="overview-panel" class="content-panel max-w-4xl mx-auto">
+            <h2>欢迎探索郎朗的《钢琴书2》</h2>
+            <p class="mt-4 text-lg">
+                继2019年《钢琴书》大获成功后，郎朗在2024年推出了《钢琴书2》。这张专辑延续了“分享音乐”的核心理念，但选曲的广度和深度都远超前作。
+            </p>
+            <p class="mt-4 text-lg">
+                它不仅包含了从巴洛克到浪漫主义的古典杰作，更大胆地跨界融合，收录了大量当代电影、热门游戏、动漫甚至网络“神曲”的改编作品。这不仅是一张炫技的专辑，更是郎朗连接古典与流行、传统与现代的桥梁。
+            </p>
+
+            <h3 class="mt-8">作曲家时期分布</h3>
+            <p>这张专辑的选曲跨越了近400年的历史，其多样性令人惊叹，充分展现了钢琴音乐的包容性。</p>
+            <div class="chart-container mt-6">
+                <canvas id="composerChart"></canvas>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <!-- Day 1 -->
-            <div class="card bg-orange-400 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day1-title">第一天：10月7日 (星期二)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day1-summary">抵达与安顿</p>
-                <div class="details-content mt-4 border-t border-orange-300">
-                    <h3 class="font-bold" id="day1-heading1">从伯明翰抵达伦敦</h3>
-                    <p class="text-sm mt-1" id="day1-details1">从伯明翰新街站乘坐火车至伦敦尤斯顿火车站，车程约1.5-2小时。建议提前预订火车票，并可考虑“分段购票”以节省费用。</p>
-                    <h3 class="font-bold mt-3" id="day1-heading2">前往住宿地</h3>
-                    <p class="text-sm mt-1" id="day1-details2">从尤斯顿站搭乘北线（Northern Line），前往老街站（Old Street Station），步行即可到达位于2 Quaker Street的住所。</p>
-                    <h3 class="font-bold mt-3" id="day1-heading3">轻松的傍晚</h3>
-                    <p class="text-sm mt-1" id="day1-details3">安顿后可步行前往附近的伦敦塔（Tower of London）和伦敦塔桥（Tower Bridge）欣赏外观，并在巴特勒码头（Butler's Wharf）的河畔餐厅享用晚餐，感受伦敦的夜色。</p>
-                </div>
-            </div>
-
-            <!-- Day 2 -->
-            <div class="card bg-blue-500 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day2-title">第二天：10月8日 (星期三)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day2-summary">皇家、购物与公园</p>
-                <div class="details-content mt-4 border-t border-blue-400">
-                    <h3 class="font-bold" id="day2-heading1">上午：皇家巡礼</h3>
-                    <p class="text-sm mt-1" id="day2-details1">上午11:00观看<span class="font-semibold">白金汉宫卫兵换岗仪式</span>，建议提前半小时到场占据有利位置。仪式后可步行前往<span class="font-semibold">威斯敏斯特教堂</span>和国会大厦，欣赏其宏伟外观，并漫步<span class="font-semibold">圣詹姆斯公园</span>。</p>
-                    <h3 class="font-bold mt-3" id="day2-heading2">下午：艺术与购物</h3>
-                    <p class="text-sm mt-1" id="day2-details2">从威斯敏斯特站乘坐地铁前往南肯辛顿站，参观<span class="font-semibold">维多利亚和阿尔伯特博物馆（V&A）</span>。该馆免费开放，收藏了世界顶级的艺术品和设计。随后，步行前往附近的<span class="font-semibold">哈罗德百货</span>，体验伦敦的奢华购物。</p>
-                </div>
-            </div>
-
-            <!-- Day 3 -->
-            <div class="card bg-green-500 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day3-title">第三天：10月9日 (星期四)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day3-summary">文化、学术与戏剧</p>
-                <div class="details-content mt-4 border-t border-green-400">
-                    <h3 class="font-bold" id="day3-heading1">上午：大英博物馆</h3>
-                    <p class="text-sm mt-1" id="day3-details1">从住所步行至利物浦街站，搭乘中央线至托特纳姆法院路站。全天精华在于<span class="font-semibold">大英博物馆</span>，其永久藏品免费开放，建议提前在线预订免费门票以节省排队时间。预留3-4小时。</p>
-                    <h3 class="font-bold mt-3" id="day3-heading2">下午：西区漫步</h3>
-                    <p class="text-sm mt-1" id="day3-details2">从大英博物馆步行至<span class="font-semibold">伦敦政治经济学院（LSE）</span>，感受学术氛围。之后在<span class="font-semibold">科芬园</span>和<span class="font-semibold">Soho</span>区自由漫步，探索书店、艺术画廊和特色商店。</p>
-                    <h3 class="font-bold mt-3" id="day3-heading3">夜晚：西区音乐剧</h3>
-                    <p class="text-sm mt-1" id="day3-details3">晚间前往西区剧院，欣赏一场世界级的音乐剧，如《歌剧魅影》。购票可选择官方网站或<span class="font-semibold">TodayTix</span>等应用获取折扣票。</p>
-                </div>
-            </div>
-
-            <!-- Day 4 -->
-            <div class="card bg-yellow-500 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day4-title">第四天：10月10日 (星期五)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day4-summary">剑桥一日游</p>
-                <div class="details-content mt-4 border-t border-yellow-400">
-                    <h3 class="font-bold" id="day4-heading1">前往剑桥</h3>
-                    <p class="text-sm mt-1" id="day4-details1">从伦敦<span class="font-semibold">国王十字车站</span>搭乘直达火车前往剑桥站，车程约48分钟。周五出行人流相对较少，可享受更舒适的旅程。</p>
-                    <h3 class="font-bold mt-3" id="day4-heading2">探索剑桥</h3>
-                    <p class="text-sm mt-1" id="day4-details2">抵达后，可以步行或乘公交车前往市中心。游览<span class="font-semibold">国王学院</span>和<span class="font-semibold">三一学院</span>，并体验最经典的<span class="font-semibold">撑船（punting）</span>。从河上欣赏叹息桥、数学桥等著名景点，感受浓厚的学术氛围。</p>
-                </div>
-            </div>
-
-            <!-- Day 5 -->
-            <div class="card bg-red-500 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day5-title">第五天：10月11日 (星期六)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day5-summary">艺术、美食与水岸</p>
-                <div class="details-content mt-4 border-t border-red-400">
-                    <h3 class="font-bold" id="day5-heading1">上午：国家美术馆</h3>
-                    <p class="text-sm mt-1" id="day5-details1">从利物浦街站搭乘中央线或环线至<span class="font-semibold">查令十字站</span>，步行即可到达。留足3小时，尽情欣赏<span class="font-semibold">国家美术馆</span>的杰作，这里收藏了从中世纪到20世纪的欧洲绘画。对了，这个地点也离老街站不远，步行可以到达</p>
-                    <h3 class="font-bold mt-3" id="day5-heading2">下午：美食与漫步</h3>
-                    <p class="text-sm mt-1" id="day5-details2">从国家美术馆步行至查令十字站，乘坐朱比利线至<span class="font-semibold">伦敦桥站</span>。周六的<span class="font-semibold">博罗市场</span>最为热闹，可品尝各式美食。之后沿着泰晤士河南岸漫步，经过<span class="font-semibold">莎士比亚环球剧场</span>和<span class="font-semibold">泰特现代艺术馆</span>，感受伦敦的艺术与文化气息。</p>
-                </div>
-            </div>
-
-            <!-- Day 6 -->
-            <div class="card bg-purple-500 text-white rounded-lg shadow-lg p-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold" id="day6-title">第六天：10月12日 (星期日)</h2>
-                    <svg class="w-6 h-6 transform transition-transform duration-300 rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </div>
-                <p class="mt-2 text-base font-medium" id="day6-summary">市场与启程</p>
-                <div class="details-content mt-4 border-t border-purple-400">
-                    <h3 class="font-bold" id="day6-heading1">上午：布里克巷市集</h3>
-                    <p class="text-sm mt-1" id="day6-details1">从住所步行至<span class="font-semibold">布里克巷（Brick Lane）</span>市集，这里是周日最热闹的地方，可以淘到独特的复古服装、独立设计和街头美食。建议在午餐前结束，为下午的行程留出充足时间。</p>
-                    <h3 class="font-bold mt-3" id="day6-heading2">下午：前往机场</h3>
-                    <p class="text-sm mt-1" id="day6-details2">考虑到<span class="font-semibold">CX250航班于18:20</span>从希思罗机场T3航站楼起飞，请在<span class="font-semibold">15:00前</span>从住所出发。从利物浦街站乘坐<span class="font-semibold">伊丽莎白线（Elizabeth Line）</span>可直达希思罗机场，车程约35分钟，方便快捷。</p>
-                </div>
-            </div>
+        <!-- Track Panels Start --><div id="track1-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>1. 肖邦: E小调前奏曲</h2>
+            <span class="english-title">Prélude in E minor, Op. 28, No. 4</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗雷德里克·肖邦 (Frédéric Chopin)</p>
+            <h3>曲目介绍</h3>
+            <p>肖邦的《24首前奏曲》是钢琴文献的基石之一。这首E小调作品是其中最著名的一首，以其深沉的忧郁和缓慢行进的和声而闻名。乐曲短小，但情感浓度极高。左手是不断变化的、沉重的和弦，而右手则是一条如泣如诉的旋律线。这首曲子常被描述为“葬礼进行时”，充满了宿命感和无尽的悲伤。</p>
+            <h3>曲目背景</h3>
+            <p>肖邦在1838-1839年与乔治·桑在马略卡岛度过了一个艰难的冬天，期间他完成了这部前奏曲集。据说这首E小调就是他在那里创作的，反映了他当时的健康状况和阴郁心境。在他自己的葬礼上，管风琴也演奏了这首作品。</p>
         </div>
-    </div>
+
+        <div id="track2-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>2. 门德尔松: "春之歌"</h2>
+            <span class="english-title">"Spring Song", Op. 62, No. 6</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 费利克斯·门德尔松 (Felix Mendelssohn)</p>
+            <h3>曲目介绍</h3>
+            <p>《春之歌》是门德尔松《无词歌》系列中最广为人知的一首。它完美地捕捉到了春天万物复苏、生机盎然的喜悦。乐曲的A段旋律轻快、跳跃，充满了幸福感；B段则稍作转折，带入一丝短暂的沉思。整首曲子洋溢着积极、乐观和精致的浪漫主义情怀，是典型的门德尔松风格——典雅而不失热情。</p>
+            <h3>曲目背景</h3>
+            <p>《无词歌》是门德尔松独创的钢琴体裁，意在用纯粹的音乐旋律来表达如同歌曲般的情感。他一生共创作了八卷《无词歌》，《春之歌》是第五卷的最后一首，展现了他作为旋律大师的非凡才华。</p>
+        </div>
+        
+        <div id="track3-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>3. 李斯特: 慰藉曲 No. 2</h2>
+            <span class="english-title">Consolation No. 2, S. 172</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗朗茨·李斯特 (Franz Liszt)</p>
+            <h3>曲目介绍</h3>
+            <p>李斯特的《慰藉曲》系列展现了他内省、抒情的一面，而非大众熟知的“炫技狂魔”。第二首（E大调）尤其宁静、甜美。它采用了类似肖邦夜曲的风格，左手是宽广的琶音伴奏，右手是悠长、充满表情的歌唱性旋律。乐曲充满了温暖的希望和宗教般的虔诚感，仿佛在轻声安慰一颗破碎的心。</p>
+            <h3>曲目背景</h3>
+            <p>这组作品创作于李斯特的“大师班”时期（约1848-1850年），当时他逐渐从巡演生活中退隐，转向作曲和教学。这首《慰藉曲》反映了他日益增长的宗教情怀和对内心平静的追求。</p>
+        </div>
+        
+        <div id="track4-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>4. 久石让: "春天"</h2>
+            <span class="english-title">"Spring" (from *Kikujiro no Natsu*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 久石让 (Joe Hisaishi)</p>
+            <h3>曲目介绍</h3>
+            <p>这是久石让为北野武的电影《菊次郎的夏天》创作的配乐之一。虽然不如《Summer》那般广为人知，但这首《Spring》同样充满了久石让标志性的纯真和淡淡的忧伤。旋律简约、干净，带有一种透明感，如同春天早晨的阳光。它在简单的重复中逐渐建立起情感的层次，让人感受到一种平静而深刻的感动。</p>
+            <h3>曲目背景</h3>
+            <p>久石让是日本国宝级的电影配乐大师，尤以与宫崎骏和北野武的合作闻名。他的音乐风格融合了极简主义、古典和流行，具有极高的辨识度。《菊次郎的夏天》原声带是他的代表作之一，完美地平衡了童趣与成人世界的孤独。</p>
+        </div>
+        
+        <div id="track5-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>5. 莫扎特: D大调回旋曲</h2>
+            <span class="english-title">Rondo in D major, K. 485</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 沃尔夫冈·阿玛多伊斯·莫扎特 (Wolfgang Amadeus Mozart)</p>
+            <h3>曲目介绍</h3>
+            <p>这是一首充满活力和幽默感的作品。虽然名为“回旋曲”，但它的结构更接近奏鸣曲式。主题（A段）欢快、明亮，充满了莫扎特式的机智和优雅。乐曲在A段和B段（发展部）之间巧妙地切换，充满了戏剧性的对比和精巧的对位。它要求演奏者手指极其灵巧、清晰，并能传达出音乐中那种“嬉戏”的特质。</p>
+            <h3>曲目背景</h3>
+            <p>这首回旋曲创作于1786年，是莫扎特在维也纳的创作高峰期。它展现了莫扎特在键盘乐器上无与伦比的才华和对形式的精湛掌控力，是古典主义时期钢琴作品的典范。</p>
+        </div>
+        
+        <div id="track6-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>6. 贝多芬: "丢失一分钱的愤怒"</h2>
+            <span class="english-title">"Rage Over a Lost Penny" (Rondo a capriccio in G major), Op. 129</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 路德维希·凡·贝多芬 (Ludwig van Beethoven)</p>
+            <h3>曲目介绍</h3>
+            <p>这首曲子的标题（并非贝多芬亲笔）生动地概括了它的内容。它是一首急板的回旋曲，主题（A段）暴躁、狂野、不断重复，仿佛一个人因为丢了个小东西而暴跳如雷。中间插入的抒情B段和C段像是短暂的“冷静”或“自我安慰”，但很快又被A段的“愤怒”主题粗暴打断。这是一首充满戏剧冲突和贝多芬式幽默的炫技作品。</p>
+            <h3>曲目背景</h3>
+            <p>这首作品创作于1795年左右，但直到贝多芬去世后才被发现并出版。它展现了早期贝多芬的“狂飙突进”风格，充满了不羁的能量和打破常规的冲动，预示了他日后交响乐中那种强大的戏剧张力。</p>
+        </div>
+        
+        <div id="track7-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>7. 萨蒂: 裸体歌舞 No. 1</h2>
+            <span class="english-title">Gymnopédie No. 1</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 埃里克·萨蒂 (Erik Satie)</p>
+            <h3>曲目介绍</h3>
+            <p>这是萨蒂最著名的作品，也是“氛围音乐”(Ambient Music) 的先驱之作。它极其简约，甚至有些怪异。左手是缓慢、空洞的和弦跳跃（一个低音，一个中音和弦），右手则是缥缈、慵懒、带有一丝古希腊色彩的旋律。乐曲没有传统的发展，只是在一种平静、抽离的冥想氛围中缓缓流动，给人一种超越时间的静态美感。</p>
+            <h3>曲目背景</h3>
+            <p>萨蒂是19世纪末20世纪初法国的“怪才”作曲家，他反对浪漫主义的夸张情感和印象主义的模糊色彩。他追求一种简单、客观、甚至“无聊”的音乐。《裸体歌舞》创作于1888年，其简约的风格在当时极具革命性，深刻影响了后来的极简主义和新世纪音乐。</p>
+        </div>
+        
+        <div id="track8-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>8. 舒伯特: G♭大调即兴曲</h2>
+            <span class="english-title">Impromptu in G-flat major, D. 899, No. 3</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗朗茨·舒伯特 (Franz Schubert)</p>
+            <h3>曲目介绍</h3>
+            <p>这是舒伯特《四首即兴曲》中最抒情、最动人的一首。它如同一首宁静的“无词歌”。右手的主旋律悠长、连贯，充满了舒伯特式的忧郁美感。左手则是流动的琶音伴奏，如同竖琴一般，为旋律提供了柔软的和声背景。整首曲子仿佛是在月光下的沉思，情感真挚而内敛。</p>
+            <h3>曲目背景</h3>
+            <p>舒伯特创作这部即兴曲集时（1827年），正值他生命的最后阶段。他的音乐摆脱了炫技的成分，达到了炉火纯青的抒情境界。这首G♭大调即兴曲因其调性（六个降号）在当时被出版商认为太难，一度将其改为G大调出版，但这破坏了原作的柔和色彩。</p>
+        </div>
+        
+        <div id="track9-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>9. 拉赫玛尼诺夫: 帕格尼尼主题狂想曲, 变奏18</h2>
+            <span class="english-title">Paganini Rhapsody: Var. 18 (from *Rhapsody on a Theme of Paganini*, Op. 43)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 谢尔盖·拉赫玛尼诺夫 (Sergei Rachmaninoff)</p>
+            <h3>曲目介绍</h3>
+            <p>这是整个古典音乐文献中最著名的“爱情旋律”之一。拉赫玛尼诺夫在这部为钢琴与乐队而作的狂想曲中，巧妙地将帕格尼尼的主题进行了“反向”处理（旋律倒置），创造出了这条令人心醉神迷、激情澎湃的新旋律。它从宁静的弱奏开始，在乐队的烘托下逐渐发展，最终达到一个宏大而炽热的情感高潮。</p>
+            <h3>曲目背景</h3>
+            <p>这部作品创作于1934年。第18变奏的巨大成功使其经常被单独拿出来改编和演奏。它出现在无数的电影（如《时光倒流七十年》）和广告中，成为浪漫主义晚期音乐的终极象征。</p>
+        </div>
+        
+        <div id="track10-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>10. 《火影忍者》: 悲伤与哀愁</h2>
+            <span class="english-title">Sadness and Sorrow (from *Naruto*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: Musashi Project (高梨康治等人)</p>
+            <h3>曲目介绍</h3>
+            <p>这是日本著名动漫《火影忍者》(Naruto) 中最经典的配乐之一。每当出现悲伤的回忆或感人的牺牲场面时，这段旋律（通常由尺八或笛子演奏）便会响起。它的旋律简单、哀婉，具有强烈的东方五声调式色彩，能瞬间勾起观众的情感共鸣。钢琴改编版保留了旋律的精髓，用和声营造出更丰富的层次感。</p>
+            <h3>曲目背景</h3>
+            <p>《火影忍者》的配乐由高梨康治和“Musashi Project”团队创作，他们成功地将日本传统乐器（如尺八、三味线）与现代摇滚、交响乐相融合，创造出独特的“火影”风格。这首《悲伤与哀愁》是其原声带中最具代表性的慢板曲目。</p>
+        </div>
+        
+        <div id="track11-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>11. 西贝柳斯: A小调练习曲</h2>
+            <span class="english-title">Etude in A minor, Op. 76, No. 2</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 让·西贝柳斯 (Jean Sibelius)</p>
+            <h3>曲目介绍</h3>
+            <p>虽然西贝柳斯以其宏大的交响乐而闻名，但他也创作了大量钢琴小品。这首A小调练习曲是一首技巧性作品，右手是快速、连续的跑动，如同北欧冬日的寒风。左手则提供稳定的和弦支撑。这首曲子短小精悍，充满了西贝柳斯式的冷峻和一丝不安的气息，是浪漫主义晚期典型的“炫技练习曲”。</p>
+            <h3>曲目背景</h3>
+            <p>《13首钢琴小品》(Op. 76) 创作于1914年。西贝柳斯本人是小提琴家出身，他对钢琴的写作方式有时被批评为“不够钢琴化”，但也正因如此，他的钢琴作品带有一种独特的、管弦乐般的质感和色彩。</p>
+        </div>
+        
+        <div id="track12-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>12. 亨德尔: G小调小步舞曲</h2>
+            <span class="english-title">Minuet in G minor, HWV 434/4</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 乔治·弗里德里希·亨德尔 (George Frideric Handel)</p>
+            <h3>曲目介绍</h3>
+            <p>这是一首巴洛克时期的键盘作品，选自亨德尔的《G小调组曲》。它具有典型的小步舞曲特征：优雅的三拍子、清晰的二部曲式（AABB）。A段庄重而典雅，B段则通过模进（重复和移高）增加了音乐的动力。这首曲子是巴洛克风格的入门佳作，要求手指清晰、节奏稳定，并能弹出不同声部的层次感。</p>
+            <h3>曲目背景</h3>
+            <p>亨德尔是巴洛克时期的音乐巨匠，与巴赫齐名。他的键盘作品虽然不如他的清唱剧（如《弥赛亚》）著名，但也充满了活力和高贵的巴洛克宫廷气息。</p>
+        </div>
+        
+        <div id="track13-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>13. 巴赫: C小调前奏曲</h2>
+            <span class="english-title">Prelude in C minor, BWV 999</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 约翰·塞巴斯蒂安·巴赫 (Johann Sebastian Bach)</p>
+            <h3>曲目介绍</h3>
+            <p>这是一首典型的巴赫“分解和弦”前奏曲。全曲由一连串快速、流动的十六分音符琶音构成，和声在巴洛克式的严谨逻辑中不断行进、变化。它原本是为鲁特琴（Lute）而作，因此在钢琴上弹奏时，需要一种特殊的触键，既要保持流动性，又要模仿鲁特琴的颗粒感和共鸣。它既是绝佳的手指练习，也是一首充满张力的音乐小品。</p>
+            <h3>曲目背景</h3>
+            <p>巴赫的许多前奏曲（如《平均律钢琴曲集》的第一首）都采用了这种琶音形式。BWV 999是他早期（约1720年）在科滕时的作品，展现了他对和声与对位无与伦比的掌控力。</p>
+        </div>
+        
+        <div id="track14-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>14. Wrangell: Rush E</h2>
+            <span class="english-title">Rush E (2024 Version)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: Andrew Wrangell (Sheet Music Boss)</p>
+            <h3>曲目介绍</h3>
+            <p>《Rush E》是近年来互联网上最著名的“黑乐谱”(Black MIDI) 之一。它最初是一个视觉噱头——乐谱上的音符密密麻麻，多到人手无法弹奏。音乐本身是一种戏谑的“伪古典”风格，旋律简单，但不断加速、增加和弦，最后达到一种疯狂、混沌的“音墙”效果。郎朗的加入，是将这个“不可能”的电脑噱头，用真人的技艺和音乐性（即便是改编版）重新诠释，打破了虚拟与现实的界限。</p>
+            <h3>曲目背景</h3>
+            <p>“黑乐谱”文化起源于日本，指那些音符数量远超人类弹奏极限的MIDI文件，旨在创造视觉和听觉的奇观。《Rush E》由澳大利亚音乐组合Sheet Music Boss于2018年创作，迅速成为网络迷因（Meme）。</p>
+        </div>
+        
+        <div id="track15-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>15. 《爱乐之城》: 米娅和塞巴斯蒂安的主题</h2>
+            <span class="english-title">Mia & Sebastian's Theme (from *La La Land*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 贾斯汀·赫尔维茨 (Justin Hurwitz)</p>
+            <h3>曲目介绍</h3>
+            <p>这是2016年现象级电影《爱乐之城》(La La Land) 的核心音乐主题。这段旋律充满了爵士乐的和声色彩和一种既浪漫又忧郁的情调，完美地代表了两位主角的爱情与梦想。它以一个简单的、略带犹豫的钢琴独奏开始，逐渐发展为更复杂、更丰富的和声，贯穿了整部电影的始终。</p>
+            <h3>曲目背景</h3>
+            <p>贾斯汀·赫尔维茨是这部电影的灵魂人物，他包办了所有作曲。这段主题旋律是他最早写出的片段之一，导演达米恩·查泽雷围绕着这段音乐构建了整部电影。它成功地复兴了经典好莱坞歌舞片的浪漫，并赢得了奥斯卡最佳原创配乐。</p>
+        </div>
+        
+        <div id="track16-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>16. 肖邦: 降E大调夜曲</h2>
+            <span class="english-title">Nocturne in E-flat major, Op. 9, No. 2</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗雷德里克·肖邦 (Frédéric Chopin)</p>
+            <h3>曲目介绍</h3>
+            <p>这是肖邦最著名的夜曲，也是钢琴初学者最向往的曲目之一。它定义了“肖邦式夜曲”的一切元素：左手是稳定而宽广的华尔兹式伴奏，右手是如同意大利歌剧咏叹调般华丽、充满装饰音（加花）的旋律。整首曲子甜美、浪漫，又带有一丝贵族的忧郁，是浪漫主义沙龙音乐的典范。</p>
+            <h3>曲目背景</h3>
+            <p>这部作品创作于肖邦20岁左右的青年时期，深受爱尔兰作曲家约翰·菲尔德（夜曲体裁的开创者）的影响。但肖邦极大地丰富了夜曲的表现力，使其成为一种极具诗意和戏剧性的体裁。</p>
+        </div>
+        
+        <div id="track17-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>17. 舒曼: "肖邦" (选自《狂欢节》)</h2>
+            <span class="english-title">"Chopin" (from *Carnaval*, Op. 9, No. 12)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 罗伯特·舒曼 (Robert Schumann)</p>
+            <h3>曲目介绍</h3>
+            <p>这首曲子选自舒曼的钢琴套曲《狂欢节》。《狂欢节》描绘了一场假面舞会，出场人物包括舒曼的恋人、朋友，以及他幻想中的角色。这首《肖邦》是舒曼对他的朋友兼“对手”肖邦的音乐致敬（或戏仿）。他模仿了肖邦夜曲的风格——流动的琶音伴奏和充满幻想、略带激动的旋律，仿佛是肖邦本人戴着面具在舞会上即兴演奏。</p>
+            <h3>曲目背景</h3>
+            <p>舒曼和肖邦是浪漫主义时期两位巨匠，风格迥异但惺惺相惜。舒曼的《狂欢节》（1835年）是他最具想象力的作品之一，充满了各种音乐“密码”和人物素描，是浪漫主义标题音乐的杰作。</p>
+        </div>
+        
+        <div id="track18-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>18. 布格缪勒: "阿拉伯风格"</h2>
+            <span class="english-title">L'Arabesque, Op. 100, No. 2</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗里德里希·布格缪勒 (Johann Friedrich Burgmüller)</p>
+            <h3>曲目介绍</h3>
+            <p>这是中国钢琴学生最熟悉的“布格缪勒练习曲”之一。它是一首A小调的练习曲，旨在训练右手的快速、均匀的跑动和左手的轻巧跳跃。旋律线条清晰、流畅，充满了古典式的均衡美感。虽然名为“阿拉伯风格”，但音乐本身更接近莫扎特或贝多芬的风格，是训练手指独立性和颗粒性触键的经典教材。</p>
+            <h3>曲目背景</h3>
+            <p>布格缪勒是德国作曲家，他的《25首简易练习曲》(Op. 100) 是钢琴教学的标准文献。与车尔尼等人纯粹的机械练习不同，布格缪勒的每首练习曲都有一个诗意的标题（如“叙事曲”、“牧歌”），并具有一定的音乐形象，因此深受琴童喜爱。</p>
+        </div>
+        
+        <div id="track19-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>19. 艾诺迪: "飞翔"</h2>
+            <span class="english-title">Fly</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 鲁多维科·艾诺迪 (Ludovico Einaudi)</p>
+            <h3>曲目介绍</h3>
+            <p>这首曲子是艾诺迪最著名的作品之一，因作为法国电影《触不可及》(Intouchables) 的配乐而火遍全球。它是一首典型的新世纪（New Age）风格作品，旋律简单、优美，在极简的和弦进行中不断重复、变奏、累积情感。它营造出一种开阔、自由、充满希望的氛围，如同在天空中翱翔，具有极强的治愈力。</p>
+            <h3>曲目背景</h3>
+            <p>艾诺迪是当今世界最成功的“新古典主义”或“极简主义”作曲家之一。他的音乐融合了古典、流行和电子元素，旋律优美、易于聆听，虽然在专业评论界存在争议，但在全球听众中拥有巨大的影响力。</p>
+        </div>
+        
+        <div id="track20-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>20. 《黑神话：悟空》: 主题曲</h2>
+            <span class="english-title">Main Theme (from *Black Myth: Wukong*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 翟锦彦</p>
+            <h3>曲目介绍</h3>
+            <p>这是备受期待的中国3A游戏大作《黑神话：悟空》的音乐主题之一。郎朗的演绎（基于翟锦彦的原作）充满了史诗感和浓郁的中国风。音乐中可以听到对《西游记》经典旋律的致敬（如《云宫迅音》的动机），但又用更现代、更恢弘的交响和声进行了重构。它描绘了一种悲壮、宿命、但又充满抗争精神的东方英雄主义。</p>
+            <h3>曲目背景</h3>
+            <p>《黑神话：悟空》自公布以来，其高品质的美术和音乐就备受关注。其配乐由青年作曲家翟锦彦操刀，他试图在好莱坞式的管弦乐法中，融入纯正的中国传统音乐元素和哲学思考，创造一种属于中国游戏的史诗之声。</p>
+        </div>
+        
+        <div id="track21-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>21. 肖邦: 幻想即兴曲</h2>
+            <span class="english-title">Fantaisie-Impromptu in C-sharp minor, Op. 66</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 弗雷德里克·肖邦 (Frédéric Chopin)</p>
+            <h3>曲目介绍</h3>
+            <p>这是肖邦最著名的炫技作品之一，也是他人气最高的作品。全曲由四个部分构成：A段（升C小调）是激流般快速的右手跑动和左手三连音的节奏错位，充满了不安和激情；B段（降D大调）是全曲的核心，一段如梦似幻、极其优美的抒情旋律；C段是A段的再现，最后在B段旋律的轻声回忆中结束。</p>
+            <h3>曲目背景</h3>
+            <p>这首曲子创作于1834年，但肖邦本人从未打算将其出版（可能因为他觉得B段旋律与莫舍列斯的一首作品相似）。直到他去世后，这首遗作才被公之于众，并立刻成为经典。</p>
+        </div>
+        
+        <div id="track22-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>22. 《最终幻想X》: 扎纳尔坎德</h2>
+            <span class="english-title">To Zanarkand (from *Final Fantasy X*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 植松伸夫 (Nobuo Uematsu)</p>
+            <h3>曲目介绍</h3>
+            <p>这是日本角色扮演游戏(JRPG)巅峰之作《最终幻想X》(Final Fantasy X) 的开场主题曲。这段旋律被誉为游戏音乐史上最伟大的旋律之一。它以简单的钢琴独奏开始，旋律充满了宿命般的悲伤、宁静和史诗感。它奠定了整个游戏“朝圣之旅”的情感基调，是无数玩家心中永恒的“圣歌”。</p>
+            <h3>曲目背景</h3>
+            <p>植松伸夫被誉为“游戏界的贝多芬”，是《最终幻想》系列的御用作曲家。他拥有非凡的旋律天赋，其作品的艺术高度和情感深度早已超越了游戏配乐的范畴。《To Zanarkand》是他职业生涯的代表作。</p>
+        </div>
+        
+        <div id="track23-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>23. 另一个夏天的童谣</h2>
+            <span class="english-title">Comptine d'un autre été, l'après-midi (from *Amélie*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 雅恩·提尔森 (Yann Tiersen)</p>
+            <h3>曲目介绍</h3>
+            <p>这是法国电影《天使爱美丽》(Amélie) 的原声带中另一首标志性曲目（区别于《艾米丽的华尔兹》）。它以快速、重复的琶音开始，营造出一种既忙碌又梦幻的氛围，仿佛巴黎街头的匆匆行人。随后，一个简单而纯真的旋律加入，充满了法式的浪漫和童趣。这首曲子是提尔森“极简主义+手风琴”风格的完美体现。</p>
+            <h3>曲目背景</h3>
+            <p>雅恩·提尔森的音乐在《天使爱美丽》上映后风靡全球。他的音乐往往使用简单的和声进行，通过乐器织体（钢琴、手风琴、玩具钢琴等）的巧妙变化来制造丰富的色彩和情感，创造了一种独特的“巴黎童话”氛围。</p>
+        </div>
+        
+        <div id="track24-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>24. "天堂电影院"</h2>
+            <span class="english-title">Cinema Paradiso (Love Theme)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 埃尼奥·莫里康内 (Ennio Morricone)</p>
+            <h3>曲目介绍</h3>
+            <p>意大利电影《天堂电影院》的配乐是电影配乐史上的不朽经典。其“爱情主题”由莫里康内的儿子安德里亚创作，而主旋律则由老莫里康内操刀。这段旋律充满了对逝去时光的无限怀旧、感伤和温暖。它如同一股温暖的洪流，将人们对童年、故乡和初恋的所有情感包裹其中，是“怀旧”这一主题的终极音乐表达。</p>
+            <h3>曲目背景</h3>
+            <p>埃尼奥·莫里康内是20世纪最伟大的电影配乐大师之一。他的作品横跨西部片、黑帮片、文艺片等多种类型。他与导演托纳多雷合作的“时光三部曲”（《天堂电影院》、《海上钢琴师》、《西西里的美丽传说》）更是达到了情感与音乐的完美融合。</p>
+        </div>
+        
+        <div id="track25-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>25. 拉赫玛尼诺夫: 升C小调前奏曲</h2>
+            <span class="english-title">Prélude in C-sharp minor, Op. 3, No. 2</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 谢尔盖·拉赫玛尼诺夫 (Sergei Rachmaninoff)</p>
+            <h3>曲目介绍</h3>
+            <p>这首曲子让年仅19岁的拉赫玛尼诺夫一举成名，但也成为了他一生的“甜蜜诅咒”（观众只点这首曲子）。乐曲以三个沉重、宿命般的音（A段）开始，仿佛敲响了克里姆林宫的丧钟。随后是B段（中段）暴风雨般急速、激动的跑动，充满了焦虑和抗争。最后，A段的“钟声”主题以排山排海般的宏大气势再现，将音乐推向毁灭性的高潮。</p>
+            <h3>曲目背景</h3>
+            <p>这部作品是拉赫玛尼诺夫《幻想小品集》中的一首。它充满了俄罗斯式的忧郁、黑暗和力量感，展现了他作为钢琴家（拥有巨手）和作曲家的非凡才华，是俄国浪漫主义晚期的代表作。</p>
+        </div>
+        
+        <div id="track26-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>26. 贝多芬: 土耳其进行曲</h2>
+            <span class="english-title">Marcia alla turca (from *Piano Sonata No. 11 in A major*, Op. 76)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 路德维希·凡·贝多芬 (Ludwig van Beethoven)</p>
+            <h3>曲目介绍</h3>
+            <p>这首曲子原是贝多芬为戏剧《雅典的废墟》所写的配乐，后来被他自己和鲁宾斯坦等人改编为钢琴独奏曲。它充满了异国情调（模仿土耳其军乐的节奏）和雄壮、欢快的进行曲风格。A段（降B大调）是广为人知的主题，B段（F小调）则形成对比，最后A段辉煌再现。这首曲子是贝多芬“英雄”风格在小品中的体现。</p>
+            <h3>曲目背景</h3>
+            <p>（*注意：这首曲子常与莫扎特的《土耳其进行曲》混淆。莫扎特的是A大调，风格更轻巧；贝多芬的是降B大调，风格更雄壮。*）郎朗收录的是贝多芬的版本，展现了钢琴作为“打击乐器”的辉煌效果。</p>
+        </div>
+        
+        <div id="track27-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>27. Tony Ann: "伊卡洛斯"</h2>
+            <span class="english-title">ICARUS</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: Tony Ann</p>
+            <h3>曲目介绍</h3>
+            <p>Tony Ann是加拿大裔的青年钢琴家、作曲家，也是新一代“网红”钢琴家。他的作品《ICARUS》以希腊神话中飞向太阳的伊卡洛斯为灵感。音乐充满了希望、激情和不断上升的动力，旋律线条优美，和声进行现代而富有色彩。它在结构上层层递进，从小溪汇成大河，最终达到一个壮丽的高潮，非常符合当代听众的审美。</p>
+            <h3>曲目背景</h3>
+            <p>Tony Ann通过在社交媒体上发布创意视频（如根据和弦进行即兴创作）而走红。他后来与老牌电音组合The Chainsmokers合作，展现了他跨越古典与流行边界的才华。《ICARUS》是他最成功的原创作品之一。</p>
+        </div>
+        
+        <div id="track28-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>28. 《原神》: "恋人的誓言"</h2>
+            <span class="english-title">Lovers' Oath (from *Genshin Impact*)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 陈致逸 (Yu-Peng Chen)</p>
+            <h3>曲目介绍</h3>
+            <p>这是现象级开放世界游戏《原神》(Genshin Impact) 中的一首经典配乐。它通常出现在“璃月”地区，旋律充满了浓郁的中国古典韵味，悠扬、婉转，仿佛在诉说一个古老而浪漫的爱情故事。钢琴改编版保留了原曲（常由民族乐器演奏）的空灵和诗意，用更丰富的和声展现了璃月港的东方幻想色彩。</p>
+            <h3>曲目背景</h3>
+            <p>陈致逸为《原神》创作的音乐（由HOYO-MiX团队制作）获得了全球性的赞誉。他成功地将中国传统五声调式与西方交响乐配器法相融合，创造出一种既恢弘大气又极具民族辨识度的音乐风格，是当代中国游戏音乐的最高水平代表。</p>
+        </div>
+        
+        <div id="track29-panel" class="content-panel max-w-4xl mx-auto hidden">
+            <h2>29. 拿撒勒: "Brejeiro" (巴西探戈)</h2>
+            <span class="english-title">Brejeiro (Tango Brasileiro)</span>
+            <p class="text-lg text-stone-600 font-medium">作曲家: 埃内斯托·拿撒勒 (Ernesto Nazareth)</p>
+            <h3>曲目介绍</h3>
+            <p>这是一首极富风情的巴西探戈（Tango Brasileiro），也被称为“Choro”（肖罗）音乐。它与阿根廷探戈的冷峻、激情不同，巴西探戈更加轻快、活泼、充满律动感。这首《Brejeiro》旋律俏皮、节奏切分感极强，充满了南美街头的舞蹈气息和乐观精神，是一首技巧和节奏感并重的炫技小品。</p>
+            <h3>曲目背景</h3>
+            <p>拿撒勒是19世纪末20世纪初的巴西作曲家，被誉为“巴西的肖邦”。他将欧洲的波尔卡、华尔兹等体裁与巴西本土的音乐节奏（如Choro）相融合，创造出了独特的“巴西探戈”风格，对后来的巴西音乐（如波萨诺瓦Bossa Nova）产生了深远影响。</p>
+        </div>
+        <!-- Track Panels End --></main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const details = card.querySelector('.details-content');
-                    const arrow = card.querySelector('svg');
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentPanels = document.querySelectorAll('.content-panel');
+            const activeClass = 'active-nav';
+            const contentArea = document.getElementById('content-area');
 
-                    details.classList.toggle('open');
-                    if (details.classList.contains('open')) {
-                        arrow.style.transform = 'rotate(180deg)';
+            function showContent(targetId) {
+                navLinks.forEach(link => {
+                    if (link.getAttribute('data-target') === targetId) {
+                        link.classList.add(activeClass);
                     } else {
-                        arrow.style.transform = 'rotate(0deg)';
+                        link.classList.remove(activeClass);
                     }
+                });
+
+                contentPanels.forEach(panel => {
+                    if (panel.id === targetId + '-panel') {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
+                
+                contentArea.scrollTop = 0; // 切换内容时滚动到顶部
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    showContent(targetId);
                 });
             });
 
-            const langToggleBtn = document.getElementById('lang-toggle-btn');
-            const gbpInput = document.getElementById('gbp-input');
-            const convertBtn = document.getElementById('convert-btn');
-            const cnyOutput = document.getElementById('cny-output');
-            const exchangeRateInfo = document.getElementById('exchange-rate-info');
-
-            let EXCHANGE_RATE = null;
-
-            const fetchExchangeRate = async () => {
-                const API_URL = 'https://api.exchangerate-api.com/v4/latest/GBP';
-                exchangeRateInfo.textContent = '汇率信息：加载中...';
-                try {
-                    const response = await fetch(API_URL);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
-                    EXCHANGE_RATE = data.rates.CNY;
-                    updateTextContent(currentLang); // Update text after fetch
-                    convertBtn.disabled = false;
-                } catch (error) {
-                    console.error('Failed to fetch exchange rate:', error);
-                    exchangeRateInfo.textContent = '汇率信息：加载失败，请重试';
-                    convertBtn.disabled = true;
-                }
-            };
-            
-            convertBtn.addEventListener('click', () => {
-                if (EXCHANGE_RATE) {
-                    const gbpAmount = parseFloat(gbpInput.value);
-                    if (!isNaN(gbpAmount)) {
-                        const cnyAmount = (gbpAmount * EXCHANGE_RATE).toFixed(2);
-                        cnyOutput.value = cnyAmount;
-                    } else {
-                        cnyOutput.value = '';
-                    }
-                }
-            });
-
-            const langContent = {
-                'zh': {
-                    'main-title': '伦敦无价之旅',
-                    'lang-btn': 'English',
-                    'converter-title': '货币转换器',
-                    'gbp-label': '英镑（GBP）',
-                    'gbp-placeholder': '输入英镑金额...',
-                    'convert-btn': '计算',
-                    'cny-label': '人民币（CNY）',
-                    'cny-placeholder': '人民币价格',
-                    'exchange-rate-info-loading': '汇率信息：加载中...',
-                    'exchange-rate-info-error': '汇率信息：加载失败，请重试',
-                    
-                    'day1-title': '第一天：10月7日 (星期二)',
-                    'day1-summary': '抵达与安顿',
-                    'day1-heading1': '从伯明翰抵达伦敦',
-                    'day1-details1': '从伯明翰新街站乘坐火车至伦敦尤斯顿火车站，车程约1.5-2小时。建议提前预订火车票，并可考虑“分段购票”以节省费用。',
-                    'day1-heading2': '前往住宿地',
-                    'day1-details2': '从尤斯顿站搭乘北线（Northern Line），前往老街站（Old Street Station），步行即可到达位于2 Quaker Street的住所。',
-                    'day1-heading3': '轻松的傍晚',
-                    'day1-details3': '安顿后可步行前往附近的伦敦塔（Tower of London）和伦敦塔桥（Tower Bridge）欣赏外观，并在巴特勒码头（Butler\'s Wharf）的河畔餐厅享用晚餐，感受伦敦的夜色。',
-
-                    'day2-title': '第二天：10月8日 (星期三)',
-                    'day2-summary': '皇家、购物与公园',
-                    'day2-heading1': '上午：皇家巡礼',
-                    'day2-details1': '上午11:00观看<span class="font-semibold">白金汉宫卫兵换岗仪式</span>，建议提前半小时到场占据有利位置。仪式后可步行前往<span class="font-semibold">威斯敏斯特教堂</span>和国会大厦，欣赏其宏伟外观，并漫步<span class="font-semibold">圣詹姆斯公园</span>。',
-                    'day2-heading2': '下午：艺术与购物',
-                    'day2-details2': '从威斯敏斯特站乘坐地铁前往南肯辛顿站，参观<span class="font-semibold">维多利亚和阿尔伯特博物馆（V&A）</span>。该馆免费开放，收藏了世界顶级的艺术品和设计。随后，步行前往附近的<span class="font-semibold">哈罗德百货</span>，体验伦敦的奢华购物。',
-
-                    'day3-title': '第三天：10月9日 (星期四)',
-                    'day3-summary': '文化、学术与戏剧',
-                    'day3-heading1': '上午：大英博物馆',
-                    'day3-details1': '从住所步行至利物浦街站，搭乘中央线至托特纳姆法院路站。全天精华在于<span class="font-semibold">大英博物馆</span>，其永久藏品免费开放，建议提前在线预订免费门票以节省排队时间。预留3-4小时。',
-                    'day3-heading2': '下午：西区漫步',
-                    'day3-details2': '从大英博物馆步行至<span class="font-semibold">伦敦政治经济学院（LSE）</span>，感受学术氛围。之后在<span class="font-semibold">科芬园</span>和<span class="font-semibold">Soho</span>区自由漫步，探索书店、艺术画廊和特色商店。',
-                    'day3-heading3': '夜晚：西区音乐剧',
-                    'day3-details3': '晚间前往西区剧院，欣赏一场世界级的音乐剧，如《歌剧魅影》。购票可选择官方网站或<span class="font-semibold">TodayTix</span>等应用获取折扣票。',
-                    
-                    'day4-title': '第四天：10月10日 (星期五)',
-                    'day4-summary': '剑桥一日游',
-                    'day4-heading1': '前往剑桥',
-                    'day4-details1': '从伦敦<span class="font-semibold">国王十字车站</span>搭乘直达火车前往剑桥站，车程约48分钟。周五出行人流相对较少，可享受更舒适的旅程。',
-                    'day4-heading2': '探索剑桥',
-                    'day4-details2': '抵达后，可以步行或乘公交车前往市中心。游览<span class="font-semibold">国王学院</span>和<span class="font-semibold">三一学院</span>，并体验最经典的<span class="font-semibold">撑船（punting）</span>。从河上欣赏叹息桥、数学桥等著名景点，感受浓厚的学术氛围。',
-
-                    'day5-title': '第五天：10月11日 (星期六)',
-                    'day5-summary': '艺术、美食与水岸',
-                    'day5-heading1': '上午：国家美术馆',
-                    'day5-details1': '从利物浦街站搭乘中央线或环线至<span class="font-semibold">查令十字站</span>，步行即可到达。留足3小时，尽情欣赏<span class="font-semibold">国家美术馆</span>的杰作，这里收藏了从中世纪到20世纪的欧洲绘画。',
-                    'day5-heading2': '下午：美食与漫步',
-                    'day5-details2': '从国家美术馆步行至查令十字站，乘坐朱比利线至<span class="font-semibold">伦敦桥站</span>。周六的<span class="font-semibold">博罗市场</span>最为热闹，可品尝各式美食。之后沿着泰晤士河南岸漫步，经过<span class="font-semibold">莎士比亚环球剧场</span>和<span class="font-semibold">泰特现代艺术馆</span>，感受伦敦的艺术与文化气息。',
-
-                    'day6-title': '第六天：10月12日 (星期日)',
-                    'day6-summary': '市场与启程',
-                    'day6-heading1': '上午：布里克巷市集',
-                    'day6-details1': '从住所步行至<span class="font-semibold">布里克巷（Brick Lane）</span>市集，这里是周日最热闹的地方，可以淘到独特的复古服装、独立设计和街头美食。建议在午餐前结束，为下午的行程留出充足时间。',
-                    'day6-heading2': '下午：前往机场',
-                    'day6-details2': '考虑到<span class="font-semibold">CX250航班于18:20</span>从希思罗机场T3航站楼起飞，请在<span class="font-semibold">15:00前</span>从住所出发。从利物浦街站乘坐<span class="font-semibold">伊丽莎白线（Elizabeth Line）</span>可直达希思罗机场，车程约35分钟，方便快捷。',
+            // Chart.js for Composer Distribution
+            const ctx = document.getElementById('composerChart').getContext('2d');
+            const composerChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['巴洛克 (2)', '古典 (3)', '浪漫 (10)', '近/现代 (2)', '当代/新世纪 (4)', '影视/游戏/媒体 (8)'],
+                    datasets: [{
+                        label: '曲目数量',
+                        data: [2, 3, 10, 2, 4, 8], 
+                        backgroundColor: [
+                            '#d97706', // Amber-700
+                            '#f59e0b', // Amber-600
+                            '#fbbf24', // Amber-500
+                            '#fcd34d', // Amber-400
+                            '#fef08a', // Amber-200
+                            '#b45309'  // Amber-800
+                        ],
+                        borderColor: '#fef3c7',
+                        borderWidth: 1
+                    }]
                 },
-                'en': {
-                    'main-title': 'Priceless London Journey',
-                    'lang-btn': '中文',
-                    'converter-title': 'Currency Converter',
-                    'gbp-label': 'British Pounds (GBP)',
-                    'gbp-placeholder': 'Enter amount in GBP...',
-                    'convert-btn': 'Convert',
-                    'cny-label': 'Chinese Yuan (CNY)',
-                    'cny-placeholder': 'Price in CNY',
-                    'exchange-rate-info-loading': 'Exchange Rate: Loading...',
-                    'exchange-rate-info-error': 'Exchange Rate: Failed to load, please retry',
-                    
-                    'day1-title': 'Day 1: October 7th (Tuesday)',
-                    'day1-summary': 'Arrival and Settlement',
-                    'day1-heading1': 'Arrive in London from Birmingham',
-                    'day1-details1': 'Take a train from Birmingham New Street station to London Euston station, a journey of about 1.5-2 hours. It is recommended to book train tickets in advance and consider "Split Ticketing" to save on costs.',
-                    'day1-heading2': 'Travel to Accommodation',
-                    'day1-details2': 'From Euston station, take the Northern Line to Old Street station. Your accommodation at 2 Quaker Street is a short walk away.',
-                    'day1-heading3': 'Relaxing Evening',
-                    'day1-details3': 'After settling in, you can walk to the nearby Tower of London and Tower Bridge to admire their exteriors. Enjoy dinner at a riverside restaurant in Butler\'s Wharf and soak in the London night scene.',
-
-                    'day2-title': 'Day 2: October 8th (Wednesday)',
-                    'day2-summary': 'Royalty, Shopping & Parks',
-                    'day2-heading1': 'Morning: Royal Tour',
-                    'day2-details1': 'Watch the <span class="font-semibold">Changing of the Guard ceremony at Buckingham Palace</span> at 11:00 AM. Arrive 30 minutes early for a good spot. Afterward, walk to see the magnificent exteriors of <span class="font-semibold">Westminster Abbey</span> and the Houses of Parliament, and stroll through <span class="font-semibold">St. James\'s Park</span>.',
-                    'day2-heading2': 'Afternoon: Art & Shopping',
-                    'day2-details2': 'Take the tube from Westminster station to South Kensington station. Visit the <span class="font-semibold">Victoria and Albert Museum (V&A)</span>, which is free to enter and houses world-class art and design collections. Subsequently, walk to the nearby <span class="font-semibold">Harrods</span> for a luxury shopping experience.',
-
-                    'day3-title': 'Day 3: October 9th (Thursday)',
-                    'day3-summary': 'Culture, Academia & Theatre',
-                    'day3-heading1': 'Morning: British Museum',
-                    'day3-details1': 'Walk from your accommodation to Liverpool Street station and take the Central Line to Tottenham Court Road. Spend the morning at the <span class="font-semibold">British Museum</span>, which is free to enter. It is recommended to book a timed ticket online to save time. Allow 3-4 hours.',
-                    'day3-heading2': 'Afternoon: West End Stroll',
-                    'day3-details2': 'Walk from the British Museum to the <span class="font-semibold">London School of Economics (LSE)</span> to feel the academic atmosphere. Afterward, wander through <span class="font-semibold">Covent Garden</span> and <span class="font-semibold">Soho</span>, exploring unique shops, art galleries, and cafes.',
-                    'day3-heading3': 'Evening: West End Musical',
-                    'day3-details3': 'In the evening, head to a West End theatre to watch a world-class musical, such as "The Phantom of the Opera." Tickets can be purchased from official websites or apps like <span class="font-semibold">TodayTix</span> for potential discounts.',
-
-                    'day4-title': 'Day 4: October 10th (Friday)',
-                    'day4-summary': 'Cambridge Day Trip',
-                    'day4-heading1': 'Travel to Cambridge',
-                    'day4-details1': 'Take a direct train from London <span class="font-semibold">King\'s Cross station</span> to Cambridge station, a journey of about 48 minutes. Traveling on a Friday means fewer crowds for a more comfortable trip.',
-                    'day4-heading2': 'Explore Cambridge',
-                    'day4-details2': 'Upon arrival, you can walk or take a bus to the city center. Visit the famous <span class="font-semibold">King\'s College</span> and <span class="font-semibold">Trinity College</span>. Don\'t miss the classic <span class="font-semibold">punting</span> experience on the River Cam, which offers unique views of iconic sights like the Bridge of Sighs and Mathematical Bridge.',
-
-                    'day5-title': 'Day 5: October 11th (Saturday)',
-                    'day5-summary': 'Art, Food & Riverside',
-                    'day5-heading1': 'Morning: National Gallery',
-                    'day5-details1': 'Take the Central or Circle Line from Liverpool Street station to <span class="font-semibold">Charing Cross station</span>. Allow at least 3 hours to fully appreciate the masterpieces at the <span class="font-semibold">National Gallery</span>, which houses a collection of European paintings from the Middle Ages to the 20th century.',
-                    'day5-heading2': 'Afternoon: Food & Stroll',
-                    'day5-details2': 'From the National Gallery, walk to Charing Cross station and take the Jubilee Line to <span class="font-semibold">London Bridge station</span>. <span class="font-semibold">Borough Market</span> is busiest on Saturday, making it the perfect time to sample a variety of street food. Afterward, stroll along the South Bank of the Thames, passing the <span class="font-semibold">Shakespeare\'s Globe</span> and the <span class="font-semibold">Tate Modern</span>.',
-
-                    'day6-title': 'Day 6: October 12th (Sunday)',
-                    'day6-summary': 'Market & Departure',
-                    'day6-heading1': 'Morning: Brick Lane Market',
-                    'day6-details1': 'Walk to the <span class="font-semibold">Brick Lane Market</span>, which is at its most vibrant on Sunday. You can find vintage clothing, independent designs, and a wide variety of street food. It\'s best to finish before lunch to allow plenty of time for your afternoon plans.',
-                    'day6-heading2': 'Afternoon: Travel to Airport',
-                    'day6-details2': 'Given that flight <span class="font-semibold">CX250 departs at 18:20</span> from Heathrow Terminal 3, please leave your accommodation before <span class="font-semibold">3:00 PM</span>. The most convenient way to the airport is to take the <span class="font-semibold">Elizabeth Line</span> directly from Liverpool Street station, which takes approximately 35 minutes.',
-                }
-            };
-
-            let currentLang = 'zh';
-
-            const updateTextContent = (lang) => {
-                document.getElementById('main-title').textContent = langContent[lang]['main-title'];
-                document.getElementById('lang-toggle-btn').textContent = langContent[lang]['lang-btn'];
-                document.getElementById('converter-title').textContent = langContent[lang]['converter-title'];
-                document.getElementById('gbp-input').placeholder = langContent[lang]['gbp-placeholder'];
-                document.getElementById('convert-btn').textContent = langContent[lang]['convert-btn'];
-                document.getElementById('cny-output').placeholder = langContent[lang]['cny-placeholder'];
-                
-                if(EXCHANGE_RATE) {
-                     document.getElementById('exchange-rate-info').textContent = lang === 'zh' ? `汇率信息：1 GBP ≈ ${EXCHANGE_RATE.toFixed(4)} CNY` : `Exchange Rate: 1 GBP ≈ ${EXCHANGE_RATE.toFixed(4)} CNY`;
-                } else {
-                     document.getElementById('exchange-rate-info').textContent = langContent[lang]['exchange-rate-info-loading'];
-                }
-
-                for (let i = 1; i <= 6; i++) {
-                    document.getElementById(`day${i}-title`).textContent = langContent[lang][`day${i}-title`];
-                    document.getElementById(`day${i}-summary`).textContent = langContent[lang][`day${i}-summary`];
-                    document.getElementById(`day${i}-heading1`).textContent = langContent[lang][`day${i}-heading1`];
-                    document.getElementById(`day${i}-details1`).innerHTML = langContent[lang][`day${i}-details1`];
-                    if (document.getElementById(`day${i}-heading2`)) {
-                        document.getElementById(`day${i}-heading2`).textContent = langContent[lang][`day${i}-heading2`];
-                        document.getElementById(`day${i}-details2`).innerHTML = langContent[lang][`day${i}-details2`];
-                    }
-                    if (document.getElementById(`day${i}-heading3`)) {
-                        document.getElementById(`day${i}-heading3`).textContent = langContent[lang][`day${i}-heading3`];
-                        document.getElementById(`day${i}-details3`).innerHTML = langContent[lang][`day${i}-details3`];
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Make it a horizontal bar chart
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#44403c' // stone-700
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        x: {
+                             ticks: {
+                                color: '#44403c', // stone-700
+                                stepSize: 1, // Ensure integer steps
+                                precision: 0 // No decimals
+                            },
+                            grid: {
+                                color: '#e7e5e4' // stone-200
+                            },
+                            beginAtZero: true // Start x-axis at zero
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1c1917', // stone-900
+                            titleColor: '#fef3c7', // amber-100
+                            bodyColor: '#fafaf9' // stone-50
+                        }
                     }
                 }
-            };
-
-            langToggleBtn.addEventListener('click', () => {
-                if (currentLang === 'zh') {
-                    currentLang = 'en';
-                } else {
-                    currentLang = 'zh';
-                }
-                updateTextContent(currentLang);
             });
 
-            // Set initial content and fetch data
-            updateTextContent(currentLang);
-            fetchExchangeRate();
-            
+            showContent('overview'); // Show overview by default
         });
     </script>
+
 </body>
 </html>
